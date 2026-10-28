@@ -51,6 +51,7 @@ namespace TNHBGLoader
 		public static ConfigEntry<string> LastLoadedAnnouncer;
 		public static ConfigEntry<string> LastLoadedSosigVLS;
 		public static ConfigEntry<bool>   EnableDebugLogging;
+		public static ConfigEntry<bool>   ApplyVoicelinesOnBoot;
 		public static ConfigEntry<string> LastLoadedSoundtrack;
 		public static ConfigEntry<bool>   IsSoundtrack;
 
@@ -106,6 +107,7 @@ namespace TNHBGLoader
 		public void InitConfig()
 		{
 			EnableDebugLogging = Config.Bind("General", "Enable Debug Logs", false, "Spams your log with debug info.");
+			ApplyVoicelinesOnBoot = Config.Bind("General", "Apply voicelines on boot", true, "If true, your selected sosig voicelines are applied as soon as H3 starts, so they work everywhere. If false, they only apply once you enter the TNH lobby.");
 			BackgroundMusicVolume = Config.Bind("General", "BGM Volume", 1f, "Changes the magnitude of the BGM volume. Must be between 0 and 4.");
 			BackgroundMusicVolume.Value = Mathf.Clamp(BackgroundMusicVolume.Value, 0, 4);
 			AnnouncerMusicVolume = Config.Bind("General", "Announcer Volume", 1f, "Changes the magnitude of the Announcer volume. Must be between 0 and 20. (Please don't set the volume to 2000%.)");
@@ -199,7 +201,11 @@ namespace TNHBGLoader
 			}
 		}
 
-		public override IEnumerator OnRuntime(IStageContext<IEnumerator> ctx) { yield break; }
+		public override IEnumerator OnRuntime(IStageContext<IEnumerator> ctx) {
+			if (ApplyVoicelinesOnBoot.Value)
+				SosigVLSAPI.RestoreSosigVLSSelection(LastLoadedSosigVLS.Value);
+			yield break;
+		}
 	}
 
 	internal static class PluginDetails
